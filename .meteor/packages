@@ -10,5 +10,6 @@ accounts-password
 http
 aldeed:collection2
 meteorhacks:npm
+npm-container
 meteorhacks:kadira
 peerlibrary:async
