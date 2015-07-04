@@ -6,25 +6,44 @@
  * @param {string} data - The data to import
  * @constructor
  */
-DataImporter = function(data) {
+DataImporter = function(normalisedData) {
 
   /**
    * Imports the data in to the datastore using the given parser/transformation function
    *
-   * @param {function} parser - A parser that can transform the data into a standardised format
+   * @param {function} callback - A parser that can transform the data into a standardised format
    */
+  this.import = function(callback) {
+    Meteor.setTimeout(function() {
+      importAsync(callback)
+    }, 0)
+  };
 
-  this.import = function(parser) {
-    var normalisedData = parser(data);
-    assert.isList(normalisedData);
+  var importAsync = function(callback) {
+    try {
+      assert.isArray(normalisedData);
 
-    // Insert each of the measurements into the database
-    var ids = _(normalisedData).collect(function(data) {
-      DatumRepository.insert(data)
-    });
+      // Insert each of the measurements into the database
+      var ids = _(normalisedData).collect(function(data) {
+        console.log('adding data', data);
 
-    return ids
+        var existingEntry = DatumRepository.findOne({
+          dataSetID: data.dataSetID,
+          dateTime: data.dateTime,
+          stationId: data.stationId
+        });
+        console.log('found', existingEntry);
 
+        if(!existingEntry) {
+          console.log('adding to db', data);
+          DatumRepository.insert(data)
+        }
+
+      });
+      callback(null, ids);
+    } catch(err) {
+      callback(err)
+    }
   }
 
 };
