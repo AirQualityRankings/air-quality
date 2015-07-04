@@ -5,5 +5,10 @@
 # but you can also edit it by hand.
 
 meteor-platform
-autopublish
-insecure
+accounts-base
+accounts-password
+http
+aldeed:collection2
+meteorhacks:npm
+meteorhacks:kadira
+peerlibrary:async
