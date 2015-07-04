@@ -1,7 +1,6 @@
 /**
  * Created by andrewwharton on 4/07/15.
  */
-
 DatumSchema = new SimpleSchema({
   dateTime: {
     type: Date
