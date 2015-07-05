@@ -14,7 +14,6 @@ TasmaniaImporter = function() {
       Meteor.bindEnvironment(ingestData)
     ], function(err, result) {
       if(err) {
-        // TODO notify that the datasource is down...
         console.log('error response', err)
       } else {
         console.log("Datum successfully added to datastore", result)
@@ -36,12 +35,8 @@ TasmaniaImporter = function() {
     try {
       var rows = Baby.parse(data.content).data;
 
-      // TODO check for already imported data
-
       var generatedDateString = rows[1][0].split(":")[1].trim();
       var generatedTimeString = rows[1][1].split(":")[1].trim().replace('.', '');
-
-      console.log(generatedTimeString);
       var dataRows = rows.slice(9, -1);
 
       var objectsToAdd = _(dataRows).collect(function(row) {
@@ -49,10 +44,11 @@ TasmaniaImporter = function() {
         var collectedTimeString = row[1].trim();
         var dateTimeString = convertToDateTimeString(generatedDateString, generatedTimeString, collectedTimeString);
         var dataSetID = "AU_TAS";
+        var date = new Date(dateTimeString);
 
         return {
           dataSetId: dataSetID,
-          dateTime: new Date(dateTimeString),
+          dateTime: date,
           stationId: dataSetID + "-" + row[0].trim(),
           pm2_5: parseFloat(row[2].trim()),
           pm10: parseFloat(row[3].trim()),
@@ -62,7 +58,6 @@ TasmaniaImporter = function() {
         }
 
       });
-      console.log(objectsToAdd);
       next(null, objectsToAdd)
     } catch(err) {
       next(err)
@@ -88,14 +83,19 @@ TasmaniaImporter = function() {
    */
   var convertToDateTimeString = function(generatedDateString, generatedTimeString, collectedTimeString) {
 
-    var year = generatedDateString.slice(0,4);
-    var month = generatedDateString.slice(4,6);
-    var day = generatedDateString.slice(6,8);
-    var collectedHour = parseInt(collectedTimeString.split(0, 2));
-    var generatedHour = parseInt(generatedTimeString.split(0,2));
+    var year = generatedDateString.trim().slice(0,4);
+    var month = generatedDateString.trim().slice(4,6);
+    var day = generatedDateString.trim().slice(6,8);
 
-    if(generatedHour < collectedHour) {
-      day = (parseInt(day) - 1).toString()
+    var generatedTime = parseInt(generatedTimeString.trim());
+    var collectedTime = parseInt(collectedTimeString.trim());
+    console.log(generatedTime, collectedTime);
+
+    if(collectedTime < collectedTime) {
+      day = (parseInt(day) - 1).toString(); // TODO what about the first day of the month?
+    }
+    if(day.length === 1) {
+      day = "0" + day; // Hack to fit the date format 03 etc.
     }
 
     var isoDateString = year + "-" + month + "-" + day;
