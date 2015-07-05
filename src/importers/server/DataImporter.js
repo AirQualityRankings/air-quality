@@ -3,7 +3,7 @@
  * Abstracts the parsing of the data by accepting a parser function as an argument
  * that can normalise the data into the format to be inserted in the datastore
  *
- * @param {string} data - The data to import
+ * @param {string} normalisedData - The data to import
  * @constructor
  */
 DataImporter = function(normalisedData) {
