@@ -3,23 +3,28 @@
  */
 DatumSchema = new SimpleSchema({
   dataSetId: {
-    type: String
+    type: String,
+    index: 1
   },
   dateTime: {
-    type: Date
+    type: Date,
+    index: 1
   },
   stationId: {
-    type: String
+    type: String,
+    index: 1
   },
   pm2_5: {
     type: Number,
     optional: true,
-    decimal: true
+    decimal: true,
+    index: 1
   },
   pm10: {
     type: Number,
     optional: true,
-    decimal: true
+    decimal: true,
+    index: 1
   },
   lat: {
     type: Number,
